@@ -92,7 +92,7 @@ class Agent(object):
         return self.Q(tf.expand_dims(state, axis=0)).numpy()[0]
     
     def update(self, s, a, r, new_s, discount=.9):
-        target = tf.constant(r + discount * np.max(self.Q(tf.expand_dims(new_s, axis=0))), dtype=tf.float32) / 100.
+        target = tf.constant(r + discount * np.max(self.Q(tf.expand_dims(new_s, axis=0))), dtype=tf.float32)
         vars = self.Q.trainable_variables
         with tf.GradientTape() as tape:
             tape.watch(target)
@@ -140,7 +140,11 @@ def train():
             print(f'Episode {e + 1} fail')
     # -- end for -- #
     print('Success rate:', float(success / episode))
-    print(agent.Q)
+    s = np.array(deepcopy(env.init_map), dtype=np.int).reshape(1, -1)
+    s = s * np.ones((s.shape[1], 1), dtype=np.int)
+    diag = np.arange(0, s.shape[0], dtype=np.int)
+    s[diag, diag] = 3
+    print(agent.Q(tf.convert_to_tensor(s, dtype=tf.float32)).numpy())
 
 
 if __name__ == '__main__':
