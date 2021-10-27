@@ -128,7 +128,7 @@ def train():
             # move
             new_state, reward, done = env.step(action)
             step += 1
-            # update q-table
+            # update q-function
             loss = agent.update(state, action, reward, new_state)
             state = new_state
             # print(f'step: {step} loss: {loss}')
