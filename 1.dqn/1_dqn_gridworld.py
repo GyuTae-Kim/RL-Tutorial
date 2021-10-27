@@ -91,8 +91,11 @@ class Agent(object):
     def get_Q(self, state):
         return self.Q(tf.expand_dims(state, axis=0)).numpy()[0]
     
-    def update(self, s, a, r, new_s, discount=.9):
-        target = tf.constant(r + discount * np.max(self.Q(tf.expand_dims(new_s, axis=0))), dtype=tf.float32)
+    def update(self, s, a, r, new_s, done, discount=.9):
+        if done:
+            target = tf.constant(r, dtype=tf.float32)
+        else:
+            target = tf.constant(r + discount * np.max(self.Q(tf.expand_dims(new_s, axis=0))), dtype=tf.float32)
         vars = self.Q.trainable_variables
         with tf.GradientTape() as tape:
             tape.watch(target)
@@ -129,7 +132,7 @@ def train():
             new_state, reward, done = env.step(action)
             step += 1
             # update q-function
-            loss = agent.update(state, action, reward, new_state)
+            loss = agent.update(state, action, reward, new_state, done)
             state = new_state
             # print(f'step: {step} loss: {loss}')
         # -- end while -- #

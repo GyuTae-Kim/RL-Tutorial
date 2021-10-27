@@ -85,8 +85,11 @@ class Agent(object):
     def get_Q(self, state):
         return self.Q[state]
     
-    def update(self, s, a, r, new_s, discount=.9):
-        self.Q[s, a] = r + discount * np.max(self.Q[new_s, :])
+    def update(self, s, a, r, new_s, done, discount=.9):
+        if done:
+            self.Q[s, a] = r
+        else:
+            self.Q[s, a] = r + discount * np.max(self.Q[new_s, :])
     
 
 def train():
@@ -113,7 +116,7 @@ def train():
             new_state, reward, done = env.step(action)
             new_state = np.argmax(new_state)
             # update q-table
-            agent.update(state, action, reward, new_state)
+            agent.update(state, action, reward, new_state, done)
             state = new_state
         # -- end while -- #
         if reward == 100.:
